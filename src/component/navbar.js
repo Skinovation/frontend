@@ -7,7 +7,7 @@ const Navbar = () => {
       className="bg-transparent backdrop-blur-sm"
       style={{
         backgroundImage:
-          'linear-gradient(to bottom, rgba(26, 53, 36, 0.9) 2%, rgba(109, 140, 84, 0.9) 60%)',
+          'linear-gradient(to bottom, rgba(109, 140, 84, 0.9) 60%)',
       }}
     >
       <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">

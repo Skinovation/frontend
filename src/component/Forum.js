@@ -1,93 +1,191 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { MdImage, MdInsertEmoticon, MdVideoLibrary } from 'react-icons/md';
+import Navbar from './navbar';
 
-const Forum = () => {
-  const [posts, setPosts] = useState([]); // Menyimpan daftar post
-  const [newPost, setNewPost] = useState(''); // Menyimpan konten post baru
-  const [showPostForm, setShowPostForm] = useState(false); // Menyembunyikan atau menampilkan form postingan
+function ForumPost() {
+  const [text, setText] = useState('');
+  const [title, setTitle] = useState('');
+  const [image, setImage] = useState(null);
+  const [posts, setPosts] = useState([]);
+  const [modalImage, setModalImage] = useState(null);
+  const [username, setUsername] = useState('');
 
-  // Menangani submit post baru
-  const handlePostSubmit = (e) => {
-    e.preventDefault();
-    setPosts([
-      ...posts,
-      { id: posts.length + 1, content: newPost, likes: 0, comments: [] },
-    ]);
-    setNewPost('');
-    setShowPostForm(false); // Menyembunyikan form setelah post dikirim
+  useEffect(() => {
+    fetch('https://maulidaa.my.id/api/sosial-media')
+      .then((response) => response.json())
+      .then((data) => setPosts(data.data.data))
+      .catch((error) => console.error('Error fetching posts:', error));
+
+    const savedUsername = localStorage.getItem('username');
+    if (savedUsername) {
+      setUsername(savedUsername);
+    }
+  }, []);
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file && file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = () => setImage(reader.result);
+      reader.readAsDataURL(file);
+    }
   };
 
-  // Menangani like pada post
-  const handleLike = (id) => {
-    setPosts(posts.map(post => post.id === id ? { ...post, likes: post.likes + 1 } : post));
-  };
+  const handlePost = () => {
+    if (title.trim() || text.trim() || image) {
+      const token = localStorage.getItem("authToken"); // Ambil token dari localStorage
 
-  // Menangani komentar pada post
-  const handleAddComment = (id, comment) => {
-    setPosts(posts.map(post => post.id === id ? { ...post, comments: [...post.comments, comment] } : post));
+      if (!token) {
+        alert("Token tidak ditemukan. Silakan login ulang.");
+        return;
+      }
+
+      const newPost = {
+        user_id: 2,
+        judul: title,
+        isi: text,
+        gambar: image,
+      };
+
+      fetch('https://maulidaa.my.id/api/sosial-media', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(newPost),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            setPosts([newPost, ...posts]);
+            setTitle('');
+            setText('');
+            setImage(null);
+            alert("Postingan berhasil disimpan!");
+          } else {
+            alert(data.message || "Gagal menyimpan postingan!");
+          }
+        })
+        .catch((error) => console.error('Error posting data:', error));
+    }
   };
 
   return (
-    <section
-      className="min-h-[600px] rounded-b-3xl"
-      style={{
-        backgroundImage: 'linear-gradient(to bottom, rgba(26, 53, 36, 0.9) 10%, rgba(109, 140, 84, 0.9) 80%, rgba(242, 246, 239, 0.9) 100%)',
-      }}
-    >
-      <div className="max-w-7xl mx-auto px-10 py-20 relative z-10">
-        <h2 className="text-white text-3xl font-bold mb-6">Forum Komunitas</h2>
+    <>
+      <Navbar />
 
-        {/* Tombol untuk membuat post baru */}
-        <button
-          onClick={() => setShowPostForm(true)}
-          className="bg-green-600 text-white p-3 rounded-full mb-6"
-        >
-          +
-        </button>
-
-        {/* Form untuk membuat post baru */}
-        {showPostForm && (
-          <form onSubmit={handlePostSubmit} className="bg-white p-4 rounded-lg shadow-md mb-6">
-            <textarea
-              className="w-full h-32 p-4 border border-gray-300 rounded-lg"
-              placeholder="Apa yang ingin kamu diskusikan?"
-              value={newPost}
-              onChange={(e) => setNewPost(e.target.value)}
+      <div className="bg-[#E9F0E5] min-h-screen px-4 py-8">
+        {/* Input Area */}
+        <div className="bg-white rounded-xl p-4 mb-6 shadow">
+          <div className="flex items-start gap-3">
+            <img
+              src="https://i.pravatar.cc/50"
+              alt="avatar"
+              className="w-10 h-10 rounded-full object-cover"
             />
-            <div className="flex justify-between items-center mt-4">
-              <button type="submit" className="bg-blue-500 text-white py-2 px-4 rounded-lg">Post</button>
-            </div>
-          </form>
-        )}
-
-        {/* Menampilkan daftar post */}
-        {posts.map(post => (
-          <div key={post.id} className="bg-white p-4 rounded-lg shadow-md mb-6">
-            <p>{post.content}</p>
-            <div className="flex justify-between items-center mt-4">
-              <button onClick={() => handleLike(post.id)} className="text-blue-500">
-                Like ({post.likes})
-              </button>
-              <div className="flex items-center">
-                <input
-                  type="text"
-                  placeholder="Add a comment"
-                  onBlur={(e) => handleAddComment(post.id, e.target.value)}
-                  className="border border-gray-300 p-2 rounded-l-lg"
-                />
-                <button className="bg-blue-500 text-white p-2 rounded-r-lg">Comment</button>
-              </div>
-            </div>
-            {/* Menampilkan komentar-komentar pada post */}
-            <div className="mt-2">
-              {post.comments.map((comment, index) => (
-                <p key={index} className="text-gray-600 ml-4">{comment}</p>
-              ))}
+            <div className="flex-1 relative">
+              <input
+                type="text"
+                className="w-full border border-gray-300 rounded-xl p-3 pl-4 pr-10 bg-[#F4FBF5] focus:outline-none"
+                placeholder="Judul Postingan"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+              />
+              <textarea
+                className="w-full border border-gray-300 rounded-xl p-3 pl-4 pr-10 bg-[#F4FBF5] focus:outline-none resize-none mt-4"
+                rows="2"
+                placeholder="Share something"
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+              />
+              <MdInsertEmoticon className="absolute top-3 right-3 text-gray-400" size={22} />
             </div>
           </div>
-        ))}
-      </div>
-    </section>
-  );
-};
 
-export default Forum;
+          <div className="flex items-center justify-between mt-4 px-2 flex-wrap gap-2">
+            <div className="flex gap-4">
+              <label className="flex items-center gap-1 cursor-pointer text-sm text-gray-700 hover:text-green-700">
+                <MdImage size={20} />
+                Image
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleImageUpload}
+                />
+              </label>
+
+              <div className="flex items-center gap-1 text-sm text-gray-400 cursor-not-allowed">
+                <MdVideoLibrary size={20} />
+                Video
+              </div>
+            </div>
+
+            <button
+              onClick={handlePost}
+              className="text-white bg-green-600 p-2 rounded-full hover:bg-green-700"
+              title="Post"
+            >
+              <svg
+                className="w-5 h-5"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        {/* Post List */}
+        {posts.map((post, idx) => (
+          <div key={idx} className="bg-white rounded-xl p-4 mb-4 shadow">
+            <div className="flex items-center gap-3 mb-2">
+              <img
+                src="https://i.pravatar.cc/50"
+                alt="avatar"
+                className="w-10 h-10 rounded-full object-cover"
+              />
+              <div>
+                <p className="font-semibold">{post.user.name}</p>
+                <p className="text-sm text-gray-500">
+                  {new Date(post.created_at).toLocaleString()}
+                </p>
+              </div>
+            </div>
+            <h3 className="font-semibold text-lg">{post.judul}</h3>
+            <p className="mb-3">{post.isi}</p>
+            {post.gambar && (
+              <img
+                src={post.gambar}
+                alt="uploaded"
+                className="w-48 h-48 object-cover rounded cursor-pointer hover:opacity-90 transition"
+                onClick={() => setModalImage(post.gambar)}
+              />
+            )}
+          </div>
+        ))}
+
+        {/* Modal Preview */}
+        {modalImage && (
+          <div
+            className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50"
+            onClick={() => setModalImage(null)}
+          >
+            <div className="bg-white p-2 rounded shadow-lg">
+              <img
+                src={modalImage}
+                alt="Full Size"
+                className="max-w-full max-h-[80vh] rounded"
+                onClick={(e) => e.stopPropagation()}
+              />
+            </div>
+          </div>
+        )}
+      </div>
+    </>
+  );
+}
+
+export default ForumPost;

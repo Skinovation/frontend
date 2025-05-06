@@ -19,9 +19,11 @@ function SignIn() {
       .then((data) => {
         console.log("Response dari backend:", data);
         if (data.token) {
-          localStorage.setItem("token", data.token);
+          // Simpan token ke localStorage
+          localStorage.setItem("authToken", data.token);
           alert("Login berhasil!");
-          navigate("/");
+          // Arahkan ke halaman beranda
+          navigate("/homepage");
         } else {
           alert(data.message || "Login gagal!");
         }

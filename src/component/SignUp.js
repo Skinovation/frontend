@@ -33,6 +33,7 @@ function SignUp() {
         if (data.token) {
           alert("Registrasi berhasil!");
           // window.location.href = "/signin";
+          
         } else {
           alert(data.message || "Registrasi gagal!");
         }

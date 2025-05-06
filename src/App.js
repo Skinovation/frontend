@@ -3,6 +3,7 @@ import './App.css';
 
 import Artikel from './component/Artikel';
 import Footer from './component/Footer';
+import Forum from './component/Forum';
 import IngredientsChecker from './component/IngredientsChecker';
 import Intro from './component/intro';
 import Join from './component/Join';
@@ -54,10 +55,12 @@ function App() {
       <div className="font-serif">
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/homepage" element={<HomePage />} /> {/* Tambahkan rute ini */}
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/ingredients-checker" element={<IngredientsChecker />} />
           <Route path="/artikel/:artikelId" element={<ArtikelDetail />} />
+          <Route path="/forum" element={<Forum />} />
         </Routes>
       </div>
     </Router>
