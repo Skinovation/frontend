@@ -17,15 +17,13 @@ function SignIn() {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log("Response dari backend:", data);
-        if (data.token) {
-          // Simpan token ke localStorage
-          localStorage.setItem("authToken", data.token);
+        console.log(data); // Debug respons dari backend
+        if (data.success && data.data?.token?.access_token) {
+          localStorage.setItem("authToken", data.data.token.access_token);
           alert("Login berhasil!");
-          // Arahkan ke halaman beranda
-          navigate("/homepage");
+          navigate("/");
         } else {
-          alert(data.message || "Login gagal!");
+          alert("Login gagal!");
         }
       })
       .catch((error) => {
