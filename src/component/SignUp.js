@@ -1,20 +1,23 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function SignUp() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const navigate = useNavigate(); // Inisialisasi useNavigate
 
   const handleRegister = (e) => {
     e.preventDefault();
 
+    // Cek kecocokan password dan konfirmasi password
     if (password !== confirmPassword) {
       alert("Password dan konfirmasi tidak cocok!");
       return;
     }
 
+    // Request API untuk registrasi
     fetch("https://maulidaa.my.id/api/auth/register", {
       method: "POST",
       headers: {
@@ -32,8 +35,7 @@ function SignUp() {
         console.log("Response dari register:", data);
         if (data.token) {
           alert("Registrasi berhasil!");
-          // window.location.href = "/signin";
-          
+          navigate("/signin"); // Redirect ke halaman login setelah registrasi berhasil
         } else {
           alert(data.message || "Registrasi gagal!");
         }
@@ -85,9 +87,6 @@ function SignUp() {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
             />
-            <div className="text-right text-sm text-green-800 hover:underline cursor-pointer">
-              Forgot Password?
-            </div>
             <button
               type="submit"
               className="w-full bg-green-800 text-white py-2 rounded-md hover:bg-green-900 transition"

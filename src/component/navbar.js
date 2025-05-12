@@ -14,7 +14,7 @@ const Navbar = () => {
         <div className="flex items-center">
           <Link to="/">
             <img
-              src="/skinovation.png"
+              src="/SKINO.png"
               alt="Skinovation Logo"
               className="h-12 w-auto"
             />

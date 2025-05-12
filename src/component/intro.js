@@ -4,44 +4,35 @@ import { Link } from "react-router-dom";
 const Intro = () => {
   return (
     <section
-      className="min-h-[600px] rounded-b-3xl overflow-hidden relative"
+      className="min-h-[550px] rounded-b-l overflow-hidden bg-cover bg-center relative"
       style={{
-        backgroundImage:
-          'linear-gradient(to bottom, rgba(26, 53, 36, 0.9) 5%, rgba(109, 140, 84, 0.9) 70%, rgba(242, 246, 239, 0.9) 100%)',
+        backgroundImage: "url('/background.png')",
       }}
     >
-      {/* Background Image */}
-      <div className="absolute top-[-5%] right-[-6%] 0 z-0">
-        <img
-          src="/bcg-intro.png"
-          alt="Background"
-          className="w-[90%] h-auto object-cover opacity-60"
-        />
-      </div>
-
-      {/* Content */}
-      <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-15 px-10 py-20 relative z-10">
-        <div className="lg:w-1/2 flex justify-start items-end mt-10 lg:mt-0">
+      {/* Konten */}
+      <div className="relative z-10 max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-15 px-10 text-white py-18">
+        <div className="lg:w-1/2 flex justify-start items-end mt-37">
           <img
             src="/human.png"
             alt="Model Skincare"
-            className="w-[80%] lg:w-[45%] mb-[-350px] lg:-ml-40 object-contain absolute"
+            className="w-[75%] lg:w-[45%] mb-[-385px] lg:-ml-40 object-contain absolute"
           />
         </div>
-
-        <div className="lg:w-full text-white flex flex-col justify-center space-y-6">
-          <h1 className="text-4xl md:text-7xl font-bold leading-relaxed text-center lg:text-left break-words">
-            Kulit Sehat, Skincare Tepat! <br />
+        <div className="lg:w-full flex flex-col justify-center space-y-8 bg-[#e4ece0cc] p-8 rounded-xl backdrop-blur-sm py-30 px-15 mt-20">
+          <h1 className="text-8xl md:text-6xl font-bold leading-[1.8] text-center lg:text-left break-words text-[#1A202C] drop-shadow-xl">
+            Kulit Sehat, <br />
+            Skincare Tepat! <br />
             Cek Kandungan Skincare-Mu Sekarang!
           </h1>
           <div className="text-center lg:text-left">
             <Link to="/ingredients-checker">
-              <button className="bg-white text-green-800 px-6 py-4 rounded-full font-medium shadow hover:bg-green-200 hover:scale-100 transition duration-300 ease-in-out">
+              <button className="bg-[#2F855A] text-white px-8 py-4 rounded-full font-semibold text-lg shadow-lg hover:bg-[#276749] transition duration-300 ease-in-out">
                 Cek Sekarang →
               </button>
             </Link>
           </div>
         </div>
+        
       </div>
     </section>
   );

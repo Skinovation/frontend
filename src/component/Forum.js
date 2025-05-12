@@ -13,7 +13,7 @@ function ForumPost() {
   useEffect(() => {
     fetch('https://maulidaa.my.id/api/sosial-media')
       .then((response) => response.json())
-      .then((data) => setPosts(data.data.data))
+      .then((data) => setPosts(data.data.data || []))
       .catch((error) => console.error('Error fetching posts:', error));
 
     const savedUsername = localStorage.getItem('username');
@@ -32,43 +32,52 @@ function ForumPost() {
   };
 
   const handlePost = () => {
-    if (title.trim() || text.trim() || image) {
-      const token = localStorage.getItem("authToken"); // Ambil token dari localStorage
-
-      if (!token) {
-        alert("Token tidak ditemukan. Silakan login ulang.");
-        return;
-      }
-
-      const newPost = {
-        user_id: 2,
-        judul: title,
-        isi: text,
-        gambar: image,
-      };
-
-      fetch('https://maulidaa.my.id/api/sosial-media', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(newPost),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          if (data.success) {
-            setPosts([newPost, ...posts]);
-            setTitle('');
-            setText('');
-            setImage(null);
-            alert("Postingan berhasil disimpan!");
-          } else {
-            alert(data.message || "Gagal menyimpan postingan!");
-          }
-        })
-        .catch((error) => console.error('Error posting data:', error));
+    if (!title.trim() && !text.trim() && !image) {
+      alert('Isi sesuatu dulu!');
+      return;
     }
+
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      alert('Token tidak ditemukan. Silakan login ulang.');
+      return;
+    }
+
+    const postData = {
+      user_id: 2,
+      judul: title,
+      isi: text,
+      gambar: image, // base64
+    };
+
+    fetch('https://maulidaa.my.id/api/sosial-media', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(postData),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          // Ambil ulang data agar fresh
+          fetch('https://maulidaa.my.id/api/sosial-media')
+            .then((response) => response.json())
+            .then((data) => setPosts(data.data.data || []));
+
+          setTitle('');
+          setText('');
+          setImage(null);
+          alert('Postingan berhasil!');
+        } else {
+          alert(data.message || 'Gagal menyimpan postingan!');
+        }
+      })
+      .catch((error) => {
+        console.error('Error posting:', error);
+        alert('Terjadi kesalahan saat posting.');
+      });
   };
 
   return (
@@ -95,7 +104,7 @@ function ForumPost() {
               <textarea
                 className="w-full border border-gray-300 rounded-xl p-3 pl-4 pr-10 bg-[#F4FBF5] focus:outline-none resize-none mt-4"
                 rows="2"
-                placeholder="Share something"
+                placeholder="Tulis isi postinganmu di sini..."
                 value={text}
                 onChange={(e) => setText(e.target.value)}
               />
@@ -115,7 +124,6 @@ function ForumPost() {
                   onChange={handleImageUpload}
                 />
               </label>
-
               <div className="flex items-center gap-1 text-sm text-gray-400 cursor-not-allowed">
                 <MdVideoLibrary size={20} />
                 Video
@@ -127,11 +135,7 @@ function ForumPost() {
               className="text-white bg-green-600 p-2 rounded-full hover:bg-green-700"
               title="Post"
             >
-              <svg
-                className="w-5 h-5"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-              >
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
               </svg>
             </button>
@@ -148,7 +152,7 @@ function ForumPost() {
                 className="w-10 h-10 rounded-full object-cover"
               />
               <div>
-                <p className="font-semibold">{post.user.name}</p>
+                <p className="font-semibold">{post.user?.name || 'Anonim'}</p>
                 <p className="text-sm text-gray-500">
                   {new Date(post.created_at).toLocaleString()}
                 </p>
@@ -167,7 +171,7 @@ function ForumPost() {
           </div>
         ))}
 
-        {/* Modal Preview */}
+        {/* Modal Image Preview */}
         {modalImage && (
           <div
             className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50"
@@ -188,4 +192,4 @@ function ForumPost() {
   );
 }
 
-export default ForumPost;
+export default ForumPost;

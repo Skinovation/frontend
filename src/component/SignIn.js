@@ -8,6 +8,8 @@ function SignIn() {
 
   const handleLogin = (e) => {
     e.preventDefault();
+
+    // Request API untuk login
     fetch("https://maulidaa.my.id/api/auth/login", {
       method: "POST",
       headers: {
@@ -17,11 +19,11 @@ function SignIn() {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data); // Debug respons dari backend
+        console.log("Response dari login:", data);
         if (data.success && data.data?.token?.access_token) {
-          localStorage.setItem("authToken", data.data.token.access_token);
+          localStorage.setItem("authToken", data.data.token.access_token); // Simpan token di localStorage
           alert("Login berhasil!");
-          navigate("/");
+          navigate("/"); // Redirect ke halaman utama setelah login berhasil
         } else {
           alert("Login gagal!");
         }
@@ -100,6 +102,7 @@ function SignIn() {
           </p>
         </div>
 
+        {/* Right side - image */}
         <div className="hidden md:block md:w-1/2">
           <img
             src="/bg-serum.jpg"
